@@ -1,136 +1,195 @@
+/* Google Font sugerida: Rubik ya está bien, pero puedes probar 'Nunito' o 'Poppins' también */
+
 /* General */
 body {
-    font-family: 'Rubik', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(to right, #fdfbfb, #ebedee);
-    color: #2c3e50;
+  font-family: 'Rubik', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to right, #fdfcfb, #e2ebf0); /* Inspirado en cielo y nubes */
+  color: #2c3e50;
+}
+
+/* Títulos */
+h1 {
+  text-align: center;
+  padding-top: 1em;
+  color: #1e3d59;
+  font-size: 2.8em;
+  text-shadow: 1px 1px 0px #c8d6e5;
+}
+
+h2 {
+  color: #1e3d59;
+  font-size: 1.6em;
+  margin-bottom: 0.5em;
+}
+
+/* Imagen centrada */
+.centrar {
+  text-align: center;
+  margin-top: 1em;
+}
+
+/* Formulario */
+form {
+  background: #ffffff;
+  padding: 2.5em;
+  margin: 2em auto;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.07);
+  max-width: 720px;
+  border-left: 5px solid #4ea8de; /* Toque temático */
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  color: #2f3e46;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+  width: 100%;
+  padding: 0.75em 1em;
+  margin-bottom: 1.2em;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 1em;
+  box-sizing: border-box;
+  background: #f8fbfd;
+  transition: all 0.3s ease;
+}
+
+input[type="radio"] {
+  width: auto;
+  margin-right: 0.4em;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #4ea8de;
+  box-shadow: 0 0 8px rgba(78, 168, 222, 0.3);
+  background: #e3f2fd;
+}
+
+/* Botón */
+button[type="submit"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 2em auto 0 auto;
+  background-color: #1e3d59;
+  color: white;
+  padding: 1em 0;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 6px 12px rgba(30, 61, 89, 0.2);
+}
+
+button:hover {
+  background-color: #4ea8de;
+  transform: scale(1.03);
+}
+
+.destino-destacado {
+  text-align: center;
+  padding: 2em 1em;
+  background: linear-gradient(135deg, #dff6ff, #ffffff);
+  border-radius: 14px;
+  border-left: 5px solid #4ea8de;
+  box-shadow: 0 8px 16px rgba(78, 168, 222, 0.1);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.destino-destacado h2 {
+  color: #1e3d59;
+  margin-bottom: 0.5em;
+}
+
+.nombre-destino {
+  font-size: 2em;
+  font-weight: bold;
+  color: #0077b6;
+  display: inline-block;
+  margin-top: 0.5em;
+}
+/* Resultados */
+#resultado,
+#resultados {
+  max-width: 720px;
+  margin: 2em auto;
+  padding: 1.5em 2em;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  /* Títulos */
-  h1 {
-    text-align: center;
-    padding-top: 1em;
-    color: #1d3557;
-    font-size: 2.5em;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  h2 {
-    color: #1d3557;
-    font-size: 1.6em;
-    margin-bottom: 0.5em;
-  }
-  
-  /* Imagen centrada */
-  .centrar {
-    text-align: center;
-    margin-top: 1em;
-  }
-  
-  /* Formulario */
-  form {
-    background: #ffffff;
-    padding: 2em;
-    margin: 2em auto;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-    max-width: 700px;
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 0.4em;
-    font-weight: 600;
-    color: #34495e;
-  }
-  
-  input[type="text"],
-  input[type="number"],
-  input[type="date"],
-  input[type="radio"],
-  select {
-    width: 100%;
-    padding: 0.75em;
-    margin-bottom: 1em;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1em;
-    box-sizing: border-box;
-  }
-  
-  input[type="radio"] {
-    width: auto;
-    margin-right: 0.5em;
-  }
-  
-  input:focus,
-  select:focus {
-    outline: none;
-    border-color: #457b9d;
-    box-shadow: 0 0 5px rgba(69, 123, 157, 0.4);
-  }
-  
-  /* Botón */
-  button {
-    background-color: #1d3557;
-    color: white;
-    padding: 0.75em 1.5em;
-    border: none;
-    border-radius: 6px;
-    font-size: 1em;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: #457b9d;
-  }
-  
-  /* Resultados */
+}
+
+#resultados ul {
+  list-style: none;
+  padding: 0;
+}
+
+#resultados li {
+  padding: 1em;
+  border-left: 4px solid #4ea8de;
+  margin-bottom: 1em;
+  background: #f0f9ff;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+#resultados li:hover {
+  background: #e1f5fe;
+  transform: scale(1.01);
+}
+
+#resultados li strong {
+  color: #1e3d59;
+}
+
+/* Botón especial de vuelo */
+#search-flights {
+  display: block;
+  margin: 2em auto;
+  width: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  form,
   #resultado,
   #resultados {
-    max-width: 700px;
-    margin: 2em auto;
-    padding: 1.5em;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    padding: 1.2em;
+    margin: 1em;
   }
-  
-  #resultados ul {
-    list-style: none;
-    padding: 0;
+
+  h1 {
+    font-size: 2.2em;
   }
-  
-  #resultados li {
-    padding: 1em;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 1em;
-    background: #f7f9fa;
-    border-radius: 8px;
+
+  button {
+    width: 100%;
   }
-  
-  #resultados li:last-child {
-    border-bottom: none;
-  }
-  
-  #resultados li strong {
-    color: #1d3557;
-  }
-  
-  #search, #search-flights {
-    width: 90%;
-    margin: 2em 1.5em;
-  }
-  /* Responsive */
-  @media (max-width: 768px) {
-    form, #resultado, #resultados {
-      padding: 1em;
-      margin: 1em;
-    }
-  
-    h1 {
-      font-size: 2em;
-    }
-  }
+}
+

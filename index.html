@@ -8,11 +8,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body>
-  <h1>Encuentro Ideal 🌍</h1>
+  <h1>TravelBuddy 🌍</h1>
 
-  <div class="centrar">
-    <img src="avion3.jpg" alt="Imagen de un avión" width="300" height="100">
-  </div>
+  <p style="text-align: center; font-size: 1.2em; color: #457b9d; margin-top: -0.5em;">
+    Encuentra el destino perfecto... <strong>¡y con quién compartirlo! 💬✈️</strong>
+  </p>
 
   <form id="preferenciasForm">
     <label for="nombre">Tu nombre:</label>
@@ -51,9 +51,14 @@
     <button type="submit">Buscar destinos ✈️</button>
   </form>
 
-  <br><button id="search-flights">Buscar vuelos ✈️</button>
+  
+  <div style="text-align: center; font-size: 1em; color: #2c3e50; margin-top: 1em;">
+    ¿Te gustaría conocer a otros aventureros con tus mismas preferencias?<br>
+    <em>TravelBuddy te ayuda a conectar y explorar juntos.</em> 🤝🌅
+  </div>
 
   <div id="resultado"></div>
+  <br><button type="submit" id="search-flights">Ver vuelos y conectar ✈️🤝</button>
   <div id="resultados"></div>
 
   <script>
@@ -110,8 +115,14 @@
               console.warn("Error al analizar vibes:", destino.vibes);
             }
           });
+          document.getElementById("resultado").innerHTML = `
+            <div class="destino-destacado">
+            <h2>🌟 Tu destino ideal es:</h2>
+            <p><span class="nombre-destino">${mejorDestino.nombre}</span></p>
+            </div>
+            <p>¡Prepárate para una aventura inolvidable!</p>`;
   
-          document.getElementById("resultado").textContent = `El destino recomendado es: ${mejorDestino.nombre}`;
+//         document.getElementById("resultado").textContent = `El destino recomendado es: ${mejorDestino.nombre}`;
         }
       });
     });
@@ -150,7 +161,9 @@
   
           const dep = leg?.departureDateTime || {};
           const fechaObj = new Date(dep.year, dep.month - 1, dep.day, dep.hour, dep.minute, dep.second);
-  
+          
+          const deepLink = itinerario.pricingOptions[0].items[0]?.deepLink || "Enlace no disponible";
+
           const fechaSalida = isNaN(fechaObj) ? "Fecha no disponible" : fechaObj.toLocaleDateString();
           const horaSalida = isNaN(fechaObj) ? "" : fechaObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   
@@ -175,10 +188,12 @@
         vuelos.forEach((vuelo) => {
           const item = document.createElement("li");
           item.innerHTML = `
-            <strong>Aerolínea:</strong> ${vuelo.aerolinea}<br>
-            <strong>Precio:</strong> ${vuelo.precio} €<br>
-            <strong>Salida:</strong> ${vuelo.fechaSalida} ${vuelo.horaSalida}h<br>
-            <strong>Destino:</strong> ${mejorDestino.nombre}
+          <a href="${itinerarios[vuelo.id].pricingOptions[0].items[0]?.deepLink || '#'}" target="_blank" style="text-decoration: none; color: inherit;">
+              <strong>Aerolínea:</strong> ${vuelo.aerolinea}<br>
+              <strong>Precio:</strong> ${vuelo.precio} €<br>
+              <strong>Salida:</strong> ${vuelo.fechaSalida} ${vuelo.horaSalida}h<br>
+              <strong>Destino:</strong> ${mejorDestino.nombre}
+            </a>
           `;
           lista.appendChild(item);
         });
