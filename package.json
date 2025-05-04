@@ -22,5 +22,6 @@
     "express": "^5.1.0",
     "expressjs": "^1.0.1",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "keywords": []
 }

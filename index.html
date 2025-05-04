@@ -5,41 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Encuentro Ideal</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body>
   <h1>Encuentro Ideal 🌍</h1>
 
   <div class="centrar">
-    <img src="avion3.jpg" alt="Imagen de un avión" width = "300" height = "100">
+    <img src="avion3.jpg" alt="Imagen de un avión" width="300" height="100">
   </div>
-  
 
   <form id="preferenciasForm">
     <label for="nombre">Tu nombre:</label>
     <input type="text" id="nombre" required><br><br>
 
     <label for="edad">Tu edad:</label>
-    <input type="number" id="number" min="0" required><br><br>
+    <input type="number" id="edad" min="0" required><br><br>
 
     <label for="origen">¿Desde qué ciudad viajas? (Código IATA, ej: MAD para Madrid):</label>
     <input type="text" id="origen" maxlength="3" required><br><br>
 
-    <label>¿Qué prefieres?</label><br>
-    <select id="tipoLugar" required>
-      <option value="">--Selecciona--</option>
-      <option value="playa">Playa</option>
-      <option value="cultura">Cultura</option>
-      <option value="naturaleza">Naturaleza</option>
-      <option value="ciudad">Ciudad</option>
-    </select><br><br>
+    <label for="nightlife_and_entertainment"> ¿Qué tan importante es la vida nocturna para ti? (0 a 5)</label><br>
+    <input type="number" id="nightlife_and_entertainment" min="0" max="5" required><br><br>
 
-    <label>¿Tu presupuesto?</label><br>
-    <select id="presupuesto" required>
-      <option value="">--Selecciona--</option>
-      <option value="bajo">Bajo</option>
-      <option value="medio">Medio</option>
-      <option value="alto">Alto</option>
-    </select><br><br>
+    <label>¿Quieres ir a un destino de playa?</label><br>
+    <input type="radio" name="beach" value="5"> Sí
+    <input type="radio" name="beach" value="0"> No<br><br>
+
+    <label for="great_food"> ¿Qué tan importante es la gastronomía para ti? (0 a 5)</label><br>
+    <input type="number" id="great_food" min="0" max="5" required><br><br>
+
+    <label>¿Te gustan los destinos con mucho arte y cultura?</label><br>
+    <input type="radio" name="art_and_culture" value="5"> Sí
+    <input type="radio" name="art_and_culture" value="0"> No<br><br>
+
+    <label>¿Estás buscando un destino menos turístico y más auténtico?</label><br>
+    <input type="radio" name="underrated_destinations" value="5"> Sí
+    <input type="radio" name="underrated_destinations" value="0"> No<br><br>
+
+    <label for="outdoor_adventures"> ¿Qué tan importante es la naturaleza y aventura? (0 a 5)</label><br>
+    <input type="number" id="outdoor_adventures" min="0" max="5" required><br><br>
 
     <label for="fecha">Fecha de salida (YYYY-MM-DD):</label>
     <input type="date" id="fecha" required><br><br>
@@ -47,63 +51,139 @@
     <button type="submit">Buscar destinos ✈️</button>
   </form>
 
+  <br><button id="search-flights">Buscar vuelos ✈️</button>
+
+  <div id="resultado"></div>
   <div id="resultados"></div>
+
   <script>
+    // Variables globales para almacenar origen, fecha y mejor destino
+    let origen = "";
+    let fecha = "";
+    let mejorDestino = "";
+  
     document.getElementById("preferenciasForm").addEventListener("submit", async (event) => {
-      event.preventDefault(); // Evita que el formulario recargue la página
+      event.preventDefault();
+  
+      // Obtener valores del formulario
+      origen = document.getElementById("origen").value;
+      fecha = document.getElementById("fecha").value;
+  
+      const respuestas = {
+        nightlife_and_entertainment: parseInt(document.getElementById("nightlife_and_entertainment").value),
+        underrated_destinations: parseInt(document.querySelector('input[name="underrated_destinations"]:checked')?.value || 0),
+        beach: parseInt(document.querySelector('input[name="beach"]:checked')?.value || 0),
+        art_and_culture: parseInt(document.querySelector('input[name="art_and_culture"]:checked')?.value || 0),
+        great_food: parseInt(document.getElementById("great_food").value),
+        outdoor_adventures: parseInt(document.getElementById("outdoor_adventures").value),
+      };
+  
+      Papa.parse("database.csv", {
+        download: true,
+        header: true,
+        complete: function(results) {
+          let destinos = results.data;
+          let mejorAfinidad = -1;
+  
+          destinos.forEach(destino => {
+            try {
+              if (!destino.vibes || destino.vibes.toLowerCase() === "null") return;
+  
+              let vibes = JSON.parse(destino.vibes.replace(/""/g, '"').replace(/^"|"$/g, ''));
+              let afinidad = 0;
+  
+              for (let clave in respuestas) {
+                let valorVibe = parseFloat(vibes[clave]);
+                if (!isNaN(valorVibe)) {
+                  afinidad += respuestas[clave] * valorVibe;
+                }
+              }
+  
+              if (afinidad > mejorAfinidad) {
+                mejorAfinidad = afinidad;
+                mejorDestino = {
+                  nombre: destino["en-GB"] || "Desconocido", // Nombre del destino
+                  iata: destino.IATA || "Desconocido"       // Código IATA del destino
+                }; // Guardar mejor destino
+              }
+            } catch (e) {
+              console.warn("Error al analizar vibes:", destino.vibes);
+            }
+          });
+  
+          document.getElementById("resultado").textContent = `El destino recomendado es: ${mejorDestino.nombre}`;
+        }
+      });
+    });
+  
+    document.getElementById("search-flights").addEventListener("click", async (event) => {
+      event.preventDefault();
   
       try {
-        console.log("Siguiente paso");
+        // Usar las variables globales en la solicitud a la API
         const response = await fetch("http://localhost:3000/buscar", {
-          method: "POST", // Solo envía la solicitud sin cuerpo
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            origen,
+            fecha,
+            destino: mejorDestino.iata // Incluir el mejor destino en la solicitud
+          })
         });
   
-        console.log("Respuesta del servidor:", response); // Verifica si hay respuesta
-  
-        // Procesa la respuesta del servidor
         const resultados = await response.json();
-        console.log("Resultados procesados:", resultados); // Imprime el JSON en la consola
-
-      // Extraer itinerarios y aerolíneas
-      const itinerarios = resultados.content.results.itineraries;
-      const carriers = resultados.content.results.carriers;
-
-      // Procesar los itinerarios
-      const vuelos = Object.keys(itinerarios).map((id) => {
-        const itinerario = itinerarios[id];
-        const precio = itinerario.pricingOptions[0].price.amount / 1000; // Convertir de miliprecios a precios normales
-        const aerolineaId = itinerario.pricingOptions[0].agentIds[0];
-        const aerolinea = carriers[aerolineaId]?.name || "Desconocida";
-
-        return {
-          id,
-          precio,
-          aerolinea,
-        };
-      });
-
-      console.log("Vuelos procesados:", vuelos);
-
-      // Mostrar los resultados en la página
-      const resultadosDiv = document.getElementById("resultados");
-      resultadosDiv.innerHTML = "<h2>Resultados de vuelos:</h2>";
-
-      if (vuelos.length === 0) {
-        resultadosDiv.innerHTML += "<p>No se encontraron vuelos.</p>";
-        return;
-      }
-
-      const lista = document.createElement("ul");
-      vuelos.forEach((vuelo) => {
-        const item = document.createElement("li");
-        item.innerHTML = `<strong>Aerolínea:</strong> ${vuelo.aerolinea} - <strong>Precio:</strong> ${vuelo.precio} €`;
-        lista.appendChild(item);
-      });
-
-      resultadosDiv.appendChild(lista);
-
-
-        //////
+        console.log("Respuesta completa de la API:", resultados); // Agrega este log ESTE ES EL NUEVO
+        const itinerarios = resultados.content.results.itineraries;
+        const carriers = resultados.content.results.carriers;
+        const legs = resultados.content.results.legs;
+  
+        const vuelos = Object.keys(itinerarios).map((id) => {
+          const itinerario = itinerarios[id];
+          const precio = parseFloat(itinerario.pricingOptions[0].price.amount) || 0;
+          const legId = itinerario.legIds[0];
+          const leg = legs[legId];
+  
+          const carrierId = leg?.marketingCarrierIds?.[0];
+          const aerolinea = carriers[carrierId]?.name || "Desconocida";
+  
+          const dep = leg?.departureDateTime || {};
+          const fechaObj = new Date(dep.year, dep.month - 1, dep.day, dep.hour, dep.minute, dep.second);
+  
+          const fechaSalida = isNaN(fechaObj) ? "Fecha no disponible" : fechaObj.toLocaleDateString();
+          const horaSalida = isNaN(fechaObj) ? "" : fechaObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  
+          return {
+            id,
+            precio: (precio / 1000).toFixed(2),
+            aerolinea,
+            fechaSalida,
+            horaSalida
+          };
+        });
+  
+        const resultadosDiv = document.getElementById("resultados");
+        resultadosDiv.innerHTML = "<h2>Resultados de vuelos:</h2>";
+  
+        if (vuelos.length === 0) {
+          resultadosDiv.innerHTML += "<p>No se encontraron vuelos.</p>";
+          return;
+        }
+  
+        const lista = document.createElement("ul");
+        vuelos.forEach((vuelo) => {
+          const item = document.createElement("li");
+          item.innerHTML = `
+            <strong>Aerolínea:</strong> ${vuelo.aerolinea}<br>
+            <strong>Precio:</strong> ${vuelo.precio} €<br>
+            <strong>Salida:</strong> ${vuelo.fechaSalida} ${vuelo.horaSalida}h<br>
+            <strong>Destino:</strong> ${mejorDestino.nombre}
+          `;
+          lista.appendChild(item);
+        });
+  
+        resultadosDiv.appendChild(lista);
       } catch (error) {
         console.error("Error al buscar vuelos:", error);
       }
